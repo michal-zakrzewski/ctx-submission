@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+src/*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Build output
+build/
+dist/
+
+# Experiment artefacts (regenerated on each run)
+logs/
+data/
+*.eval
+*.pdf
+*.png
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

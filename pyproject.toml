@@ -1,0 +1,37 @@
+[project]
+name = "layout-matters"
+version = "0.1.0"
+description = "Evidence-controlled layout protocol for long-context retrieval"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=2.18.0",
+    "inspect-ai>=0.3.160",
+    "matplotlib>=3.8.0",
+    "openai>=1.30.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.5.0",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+markers = ["integration: requires external services (e.g. Ollama)"]
