@@ -16,11 +16,14 @@ import matplotlib.pyplot as plt
 LAYOUTS = ["baseline", "query_first", "query_sandwich", "q_repeat_end", "isolated_sections"]
 LAYOUT_LABELS = ["Baseline", "Query-first", "Query-sandwich", "Q-repeat-end", "Iso-sections"]
 
-# (is_group_A, F1 at depth=100% conditioned on needle in E' for each layout)
+# (is_collapse_group, F1 at depth=100% conditioned on needle in E' for each layout)
+# Canonical sources: SLMs from rows.jsonl filtered to /exp1-rev/;
+# Phi/Qwen3B/Gemma from logs/exp1/<model>/aggregated.json;
+# Qwen2.5-Coder 7B and Llama 3.1 8B from rows_7b_*.jsonl.
 DATA = {
-    "DeepSeek-R1\n1.5B":      (True,  [0.352, 0.036, 0.389, 0.438, 0.560]),
-    "Llama 3.2\n3B":          (True,  [0.810, 0.028, 0.802, 0.702, 0.876]),
-    "Ministral 3\n3B":        (True,  [0.704, 0.042, 0.702, 0.490, 0.879]),
+    "DeepSeek-R1\n1.5B":      (True,  [0.445, 0.033, 0.321, 0.376, 0.496]),
+    "Llama 3.2\n3B":          (True,  [0.693, 0.031, 0.797, 0.640, 0.887]),
+    "Ministral 3\n3B":        (True,  [0.832, 0.029, 0.690, 0.504, 0.898]),
     "Gemma2\n9B":             (True,  [0.746, 0.027, 0.885, 0.723, 0.763]),
     "Phi-3.5-mini\n3.8B":     (False, [0.635, 0.815, 0.832, 0.580, 0.790]),
     "Qwen2.5\n3B":            (False, [1.000, 0.936, 1.000, 1.000, 1.000]),
@@ -28,8 +31,8 @@ DATA = {
     "Llama 3.1\n8B":          (False, [0.732, 0.981, 0.962, 0.643, 0.651]),
 }
 
-COLOR_A = "#d62728"
-COLOR_B = "#1f77b4"
+COLOR_COLLAPSE = "#d62728"
+COLOR_NONCOLLAPSE = "#1f77b4"
 LAYOUT_COLORS = ["#555555", "#e07b39", "#2ca02c", "#9467bd", "#17becf"]
 
 
@@ -56,7 +59,7 @@ def main(out_path: str = "fig_layout_gap.pdf") -> None:
     ax.set_xticks(x_centers)
     ax.set_xticklabels(models, fontsize=8.5)
     for tick, model in zip(ax.get_xticklabels(), models):
-        tick.set_color(COLOR_A if DATA[model][0] else COLOR_B)
+        tick.set_color(COLOR_COLLAPSE if DATA[model][0] else COLOR_NONCOLLAPSE)
 
     ax.set_ylabel("Token F1 (depth 100%, conditioned)", fontsize=9)
     ax.set_ylim(0, 1.08)
@@ -67,13 +70,13 @@ def main(out_path: str = "fig_layout_gap.pdf") -> None:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-    # Group A / Group B divider + header labels
+    # Collapse / non-collapse divider + header labels
     div_x = (x_centers[3] + x_centers[4]) / 2
     ax.axvline(div_x, color="gray", linestyle=":", linewidth=1.2, alpha=0.7)
-    ax.text(div_x - 0.55, 1.04, "Group A (layout-sensitive)",
-            ha="center", va="bottom", fontsize=8, color=COLOR_A)
-    ax.text(div_x + 0.72, 1.04, "Group B (layout-robust)",
-            ha="center", va="bottom", fontsize=8, color=COLOR_B)
+    ax.text(div_x - 0.55, 1.04, "Collapse group (query-first F1<0.05)",
+            ha="center", va="bottom", fontsize=8, color=COLOR_COLLAPSE)
+    ax.text(div_x + 0.72, 1.04, "Non-collapse group",
+            ha="center", va="bottom", fontsize=8, color=COLOR_NONCOLLAPSE)
 
     layout_patches = [
         mpatches.Patch(color=c, label=lbl, alpha=0.85)
